@@ -1,5 +1,5 @@
 import { QueryResult, PoolClient } from 'pg';
-export declare const DB: {
+declare const database: {
     totalCount: () => number;
     idleCount: () => number;
     waitingCount: () => number;
@@ -10,3 +10,4 @@ export declare const DB: {
         (callback: () => void): void;
     };
 };
+export { database };

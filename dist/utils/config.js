@@ -3,12 +3,14 @@ Object.defineProperty(exports, "__esModule", { value: true });
 // Load the environment variables
 require('dotenv').config();
 // Retrieve the env variables
-var _a = process.env, PORT = _a.PORT, NODE_ENV = _a.NODE_ENV, PGHOST = _a.PGHOST, PGUSER = _a.PGUSER, PGDATABASE = _a.PGDATABASE, PGPASSWORD = _a.PGPASSWORD, PGPRT = _a.PGPRT;
-exports.PORT = PORT;
-exports.NODE_ENV = NODE_ENV;
-exports.PGHOST = PGHOST;
-exports.PGUSER = PGUSER;
-exports.PGDATABASE = PGDATABASE;
-exports.PGPASSWORD = PGPASSWORD;
-var PGPORT = parseInt(PGPRT, 10);
-exports.PGPORT = PGPORT;
+const config = {
+    PORT: process.env.PORT,
+    NODE_ENV: process.env.NODE_ENV,
+    PGHOST: process.env.PGHOST,
+    PGUSER: process.env.PGUSER,
+    PGDATABASE: process.env.PGDATABASE,
+    PGPASSWORD: process.env.PGPASSWORD,
+    PGPORT: process.env.PGPORT,
+};
+exports.config = config;
+console.log(config.NODE_ENV);

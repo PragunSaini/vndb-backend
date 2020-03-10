@@ -1,23 +1,33 @@
+// Libraries
 import express from 'express'
-import { PORT } from './utils/config'
-import { Console } from './utils/logger'
+import cors from 'cors'
+import bodyParser from 'body-parser'
 
+// Imports
+import { middleware } from './utils/middleware'
+import { config } from './utils/config'
+import { Console } from './utils/logger'
+import { database } from './db/db'
+
+// Create the app
 const app = express()
 
-// app.get('/', async (req, res) => {
-//   const client = await DB.getClient()
-//   try {
-//     const result = await client.query('Select * from vn where id = $1', [4])
-//     client.release()
-//     res.json(result)
-//   } catch (err) {
-//     Console.log(err)
-//     res.json({ response: 'ERRED' })
-//   }
-//   await DB.end()
-//   Console.log('ENDED')
-// })
+// Deploy Middleware
+app.use(middleware.xPoweredByHeader)
+app.use(cors())
+app.use(bodyParser.json())
 
-app.listen(PORT, () => {
-  Console.info(`Listening on PORT ${PORT} ...`)
+// Declare routes
+app.get('/', async (req, res) => {
+  try {
+    const result = await database.query('SELECT * FROM vn WHERE id = $1', [100])
+    res.json(result)
+  } catch (err) {
+    Console.error(err)
+  }
+})
+
+// Start the server
+app.listen(config.PORT, () => {
+  Console.info(`Listening on PORT ${config.PORT} ...`)
 })

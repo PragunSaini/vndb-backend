@@ -1,10 +1,12 @@
 // @ts-nocheck
 /* eslint-disable */
-import { Pool, ClientConfig, QueryResult, PoolClient } from 'pg'
+import { Pool, QueryResult, PoolClient, PoolConfig } from 'pg'
 import { Console } from '../utils/logger'
-import { PGHOST, PGUSER, PGDATABASE, PGPASSWORD, PGPORT } from '../utils/config'
+import { config } from '../utils/config'
 
-const config: ClientConfig = {
+const { PGHOST, PGUSER, PGDATABASE, PGPASSWORD, PGPORT } = config
+
+const dbconfig: PoolConfig = {
   user: PGUSER,
   host: PGHOST,
   password: PGPASSWORD,
@@ -12,9 +14,9 @@ const config: ClientConfig = {
   port: PGPORT,
 }
 
-const pool = new Pool(config)
+let pool = new Pool(dbconfig)
 
-export const DB = {
+const database = {
   totalCount: (): number => {
     return pool.totalCount
   },
@@ -62,3 +64,5 @@ export const DB = {
   },
   end: pool.end.bind(pool),
 }
+
+export { database }

@@ -1,9 +1,27 @@
 // Load the environment variables
 require('dotenv').config()
 
+interface EnvConfig {
+  PORT: string | number | undefined
+  NODE_ENV: string | number | undefined
+  PGHOST: string | number | undefined
+  PGUSER: string | number | undefined
+  PGDATABASE: string | number | undefined
+  PGPASSWORD: string | number | undefined
+  PGPORT: string | number | undefined
+}
+
 // Retrieve the env variables
-const { PORT, NODE_ENV, PGHOST, PGUSER, PGDATABASE, PGPASSWORD, PGPRT } = process.env
-const PGPORT = parseInt(PGPRT as string, 10)
+const config: EnvConfig = {
+  PORT: process.env.PORT,
+  NODE_ENV: process.env.NODE_ENV,
+  PGHOST: process.env.PGHOST,
+  PGUSER: process.env.PGUSER,
+  PGDATABASE: process.env.PGDATABASE,
+  PGPASSWORD: process.env.PGPASSWORD,
+  PGPORT: process.env.PGPORT,
+}
+console.log(config.NODE_ENV)
 
 // Export them for use
-export { PORT, NODE_ENV, PGHOST, PGUSER, PGDATABASE, PGPASSWORD, PGPORT }
+export { config }

@@ -1,3 +1,11 @@
-declare const PORT: string | undefined, NODE_ENV: string | undefined, PGHOST: string | undefined, PGUSER: string | undefined, PGDATABASE: string | undefined, PGPASSWORD: string | undefined;
-declare const PGPORT: number;
-export { PORT, NODE_ENV, PGHOST, PGUSER, PGDATABASE, PGPASSWORD, PGPORT };
+interface EnvConfig {
+    PORT: string | number | undefined;
+    NODE_ENV: string | number | undefined;
+    PGHOST: string | number | undefined;
+    PGUSER: string | number | undefined;
+    PGDATABASE: string | number | undefined;
+    PGPASSWORD: string | number | undefined;
+    PGPORT: string | number | undefined;
+}
+declare const config: EnvConfig;
+export { config };
