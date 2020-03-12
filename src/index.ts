@@ -13,9 +13,10 @@ import { database } from './db/db'
 const app = express()
 
 // Deploy Middleware
-app.use(middleware.xPoweredByHeader)
 app.use(cors())
 app.use(bodyParser.json())
+app.use(middleware.xPoweredByHeader)
+app.use(middleware.requestLogger)
 
 // Declare routes
 app.get('/', async (req, res) => {
@@ -27,7 +28,11 @@ app.get('/', async (req, res) => {
   }
 })
 
+// Error Handling Middleware
+app.use(middleware.unknownEndpoint)
+app.use(middleware.errorHandler)
+
 // Start the server
 app.listen(config.PORT, () => {
-  logger.info(`Listening on PORT ${config.PORT} ...`)
+  logger.info(`Listening on PORT ${config.PORT} ...\n`)
 })

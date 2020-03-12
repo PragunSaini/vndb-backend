@@ -24,9 +24,10 @@ const db_1 = require("./db/db");
 // Create the app
 const app = express_1.default();
 // Deploy Middleware
-app.use(middleware_1.middleware.xPoweredByHeader);
 app.use(cors_1.default());
 app.use(body_parser_1.default.json());
+app.use(middleware_1.middleware.xPoweredByHeader);
+app.use(middleware_1.middleware.requestLogger);
 // Declare routes
 app.get('/', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
@@ -37,7 +38,10 @@ app.get('/', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         logger_1.logger.error(err);
     }
 }));
+// Error Handling Middleware
+app.use(middleware_1.middleware.unknownEndpoint);
+app.use(middleware_1.middleware.errorHandler);
 // Start the server
 app.listen(config_1.config.PORT, () => {
-    logger_1.logger.info(`Listening on PORT ${config_1.config.PORT} ...`);
+    logger_1.logger.info(`Listening on PORT ${config_1.config.PORT} ...\n`);
 });
