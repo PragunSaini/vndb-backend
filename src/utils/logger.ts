@@ -21,7 +21,7 @@ function info(...text: any[]): void {
   colorLog(Color.FgCyan, ...text)
 }
 
-export const Console = {
+export const logger = {
   query: query,
   error: error,
   log: log,

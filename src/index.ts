@@ -6,7 +6,7 @@ import bodyParser from 'body-parser'
 // Imports
 import { middleware } from './utils/middleware'
 import { config } from './utils/config'
-import { Console } from './utils/logger'
+import { logger } from './utils/logger'
 import { database } from './db/db'
 
 // Create the app
@@ -23,11 +23,11 @@ app.get('/', async (req, res) => {
     const result = await database.query('SELECT * FROM vn WHERE id = $1', [100])
     res.json(result)
   } catch (err) {
-    Console.error(err)
+    logger.error(err)
   }
 })
 
 // Start the server
 app.listen(config.PORT, () => {
-  Console.info(`Listening on PORT ${config.PORT} ...`)
+  logger.info(`Listening on PORT ${config.PORT} ...`)
 })

@@ -34,10 +34,10 @@ app.get('/', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         res.json(result);
     }
     catch (err) {
-        logger_1.Console.error(err);
+        logger_1.logger.error(err);
     }
 }));
 // Start the server
 app.listen(config_1.config.PORT, () => {
-    logger_1.Console.info(`Listening on PORT ${config_1.config.PORT} ...`);
+    logger_1.logger.info(`Listening on PORT ${config_1.config.PORT} ...`);
 });

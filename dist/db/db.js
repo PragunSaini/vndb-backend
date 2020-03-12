@@ -37,7 +37,7 @@ const database = {
         const start = Date.now();
         const res = yield pool.query(text, params);
         const end = Date.now();
-        logger_1.Console.query(text, start, end);
+        logger_1.logger.query(text, start, end);
         return res;
     }),
     getClient: () => __awaiter(void 0, void 0, void 0, function* () {
@@ -46,15 +46,15 @@ const database = {
         client.query = (text, params) => __awaiter(void 0, void 0, void 0, function* () {
             client.lastQuery = text;
             const start = Date.now();
-            logger_1.Console.info('Querying...');
+            logger_1.logger.info('Querying...');
             const res = yield query.apply(client, [text, params]);
             const end = Date.now();
-            logger_1.Console.query(text, start, end);
+            logger_1.logger.query(text, start, end);
             return res;
         });
         const timeout = setTimeout(() => {
-            logger_1.Console.error('A client has been checked out for more than 5 seconds!');
-            logger_1.Console.error(`The last executed query on this client was: ${client.lastQuery}`);
+            logger_1.logger.error('A client has been checked out for more than 5 seconds!');
+            logger_1.logger.error(`The last executed query on this client was: ${client.lastQuery}`);
         }, 5000);
         const release = client.release;
         client.release = err => {

@@ -18,7 +18,7 @@ function log(...text) {
 function info(...text) {
     colors_1.colorLog(colors_1.Color.FgCyan, ...text);
 }
-exports.Console = {
+exports.logger = {
     query: query,
     error: error,
     log: log,
