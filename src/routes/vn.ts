@@ -13,6 +13,7 @@ vnRouter.get('/:id', async (req, res, next) => {
     const vnid = parseInt(req.params.id, 10)
     res.json(await getvn(vnid))
   } catch (err) {
+    console.log(err)
     next(err)
   }
 })

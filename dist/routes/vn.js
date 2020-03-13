@@ -23,6 +23,7 @@ vnRouter.get('/:id', (req, res, next) => __awaiter(void 0, void 0, void 0, funct
         res.json(yield vn_1.getvn(vnid));
     }
     catch (err) {
+        console.log(err);
         next(err);
     }
 }));
