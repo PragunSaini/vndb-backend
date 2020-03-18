@@ -1,5 +1,6 @@
 // Custom implementation for modified console printing and logging
 import { Color, colorLog } from './colors'
+import { config } from './config'
 
 /**
  * Logs a database query
@@ -8,11 +9,13 @@ import { Color, colorLog } from './colors'
  * @param end Query completed timestamp
  */
 function query(text: string, start: number, end: number): void {
-  console.log()
-  colorLog(Color.FgYellow, `${new Date(start).toString()}`)
-  colorLog(Color.FgYellow, `Query: ${text}`)
-  colorLog(Color.FgYellow, `Time taken: ${end - start} ms`)
-  console.log()
+  if (config.NODE_ENV == 'development') {
+    console.log()
+    colorLog(Color.FgYellow, `${new Date(start).toString()}`)
+    colorLog(Color.FgYellow, `Query: ${text}`)
+    colorLog(Color.FgYellow, `Time taken: ${end - start} ms`)
+    console.log()
+  }
 }
 
 /**

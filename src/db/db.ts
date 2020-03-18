@@ -42,8 +42,9 @@ const database = {
     client.query = async <T extends Submittable>(params: T | paramsType): Promise<resultType> => {
       client.lastQuery = (params as unknown) as paramsType
       const start = Date.now()
-      logger.info('Querying...')
-      const res: resultType | void = await query.apply(client, (params as unknown) as paramsType)
+      const res: resultType = ((await query.apply(client, ([
+        params,
+      ] as unknown) as paramsType)) as unknown) as resultType
       const end = Date.now()
       logger.query(((params as unknown) as paramsType)[0], start, end)
       return (res as unknown) as resultType
