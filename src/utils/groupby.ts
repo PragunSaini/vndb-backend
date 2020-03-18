@@ -1,13 +1,14 @@
-type keymap = (obj: any) => any[]
+// Gets the union type made up of an object T's value's types
+type ValueOf<T> = T[keyof T]
 
 /**
  * Groups together objects in an array based on one or more properties
  * @param array Array of objects to be grouped
  * @param keyFunc function that returns the values to group the objects by, in an array
  */
-export function groupBy(array: any[], keyFunc: keymap): any[] {
+export function groupBy<T, V extends ValueOf<T>>(array: T[], keyFunc: (obj: T) => V[]): T[][] {
   // To hold the groups
-  const groups: any = {}
+  const groups: { [key: string]: T[] } = {}
 
   // For each group
   array.forEach(obj => {

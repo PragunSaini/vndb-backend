@@ -28,7 +28,7 @@ describe('groupBy utility', () => {
 
   test('Group by single property (deep check)', () => {
     const res = groupBy(smallermock, obj => [obj.id])
-    res.forEach((arr: any[]) => {
+    res.forEach(arr => {
       if (arr[0].id == 1) {
         arr.forEach(obj => {
           expect([144, 122]).toContain(obj.rid)
@@ -42,6 +42,7 @@ describe('groupBy utility', () => {
   })
 
   test('Group by multiple properties', () => {
+    // const res = groupBy(mock, obj => [obj.id, obj.lang])
     const res = groupBy(mock, obj => [obj.id, obj.lang])
     expect(res.length).toBe(7)
   })
