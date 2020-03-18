@@ -1,20 +1,18 @@
-// @ts-nocheck
-/* eslint-disable */
-import { Pool, QueryResult, PoolClient, PoolConfig } from 'pg'
+import { Pool, QueryResult, PoolClient, PoolConfig, Submittable } from 'pg'
 import { logger } from '../utils/logger'
 import { config } from '../utils/config'
 
 const { PGHOST, PGUSER, PGDATABASE, PGPASSWORD, PGPORT } = config
 
 const dbconfig: PoolConfig = {
-  user: PGUSER,
-  host: PGHOST,
-  password: PGPASSWORD,
-  database: PGDATABASE,
-  port: PGPORT,
+  user: PGUSER as string,
+  host: PGHOST as string,
+  password: PGPASSWORD as string,
+  database: PGDATABASE as string,
+  port: PGPORT as number,
 }
 
-let pool = new Pool(dbconfig)
+const pool = new Pool(dbconfig)
 
 const database = {
   totalCount: (): number => {
@@ -34,17 +32,21 @@ const database = {
     return res
   },
   getClient: async (): Promise<PoolClient> => {
-    const client = await pool.connect()
+    const client: PoolClient & { lastQuery?: any[] } = await pool.connect()
     const query = client.query
 
-    client.query = async (text: string, params: any[]): Promise<QueryResult<any>> => {
-      client.lastQuery = text
+    type paramsType = Parameters<typeof query>
+    type resultType = QueryResult<any>
+
+    // Not proud of this :(, but Typescript apparently doesn't have some kind of union of overloads
+    client.query = async <T extends Submittable>(params: T | paramsType): Promise<resultType> => {
+      client.lastQuery = (params as unknown) as paramsType
       const start = Date.now()
       logger.info('Querying...')
-      const res = await query.apply(client, [text, params])
+      const res: resultType | void = await query.apply(client, (params as unknown) as paramsType)
       const end = Date.now()
-      logger.query(text, start, end)
-      return res
+      logger.query(((params as unknown) as paramsType)[0], start, end)
+      return (res as unknown) as resultType
     }
 
     const timeout = setTimeout(() => {
@@ -53,7 +55,7 @@ const database = {
     }, 5000)
 
     const release = client.release
-    client.release = err => {
+    client.release = (err): void => {
       clearTimeout(timeout)
       client.query = query
       client.release = release
@@ -62,7 +64,7 @@ const database = {
 
     return client
   },
-  end: pool.end.bind(pool),
+  end: pool.end.bind(pool) as () => Promise<void>,
 }
 
 export { database }

@@ -5,9 +5,6 @@ declare const database: {
     waitingCount: () => number;
     query: (text: string, params: any[]) => Promise<QueryResult<any>>;
     getClient: () => Promise<PoolClient>;
-    end: {
-        (): Promise<void>;
-        (callback: () => void): void;
-    };
+    end: () => Promise<void>;
 };
 export { database };

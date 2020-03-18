@@ -9,8 +9,6 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-// @ts-nocheck
-/* eslint-disable */
 const pg_1 = require("pg");
 const logger_1 = require("../utils/logger");
 const config_1 = require("../utils/config");
@@ -22,7 +20,7 @@ const dbconfig = {
     database: PGDATABASE,
     port: PGPORT,
 };
-let pool = new pg_1.Pool(dbconfig);
+const pool = new pg_1.Pool(dbconfig);
 const database = {
     totalCount: () => {
         return pool.totalCount;
@@ -43,13 +41,14 @@ const database = {
     getClient: () => __awaiter(void 0, void 0, void 0, function* () {
         const client = yield pool.connect();
         const query = client.query;
-        client.query = (text, params) => __awaiter(void 0, void 0, void 0, function* () {
-            client.lastQuery = text;
+        // Not proud of this :(, but Typescript apparently doesn't have some kind of union of overloads
+        client.query = (params) => __awaiter(void 0, void 0, void 0, function* () {
+            client.lastQuery = params;
             const start = Date.now();
             logger_1.logger.info('Querying...');
-            const res = yield query.apply(client, [text, params]);
+            const res = yield query.apply(client, params);
             const end = Date.now();
-            logger_1.logger.query(text, start, end);
+            logger_1.logger.query(params[0], start, end);
             return res;
         });
         const timeout = setTimeout(() => {
@@ -57,7 +56,7 @@ const database = {
             logger_1.logger.error(`The last executed query on this client was: ${client.lastQuery}`);
         }, 5000);
         const release = client.release;
-        client.release = err => {
+        client.release = (err) => {
             clearTimeout(timeout);
             client.query = query;
             client.release = release;
