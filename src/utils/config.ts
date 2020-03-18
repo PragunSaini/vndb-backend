@@ -21,7 +21,6 @@ const config: EnvConfig = {
   PGPASSWORD: process.env.PGPASSWORD,
   PGPORT: process.env.PGPORT,
 }
-console.log(config.NODE_ENV)
 
 // Export them for use
 export { config }

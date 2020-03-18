@@ -1,3 +1,6 @@
+/**
+ * Color/Style Presets
+ */
 export declare const Color: {
     Reset: string;
     Bright: string;
@@ -23,5 +26,15 @@ export declare const Color: {
     BgCyan: string;
     BgWhite: string;
 };
+/**
+ * Returns a styled string made of given values and color/style presets
+ * @param color A single/array of Color/Style Presets
+ * @param string Array of values to be printed
+ */
 export declare function colorString(color: string | string[], ...string: any[]): string;
+/**
+ * Styles and prints the given values to the console and resets the console
+ * @param color A single/array of Color/Style Presets
+ * @param string Array of values to be printed
+ */
 export declare function colorLog(color: string | string[], ...string: any[]): void;

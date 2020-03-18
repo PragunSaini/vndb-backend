@@ -1,6 +1,8 @@
 "use strict";
-// console printing modifiers
 Object.defineProperty(exports, "__esModule", { value: true });
+/**
+ * Color/Style Presets
+ */
 exports.Color = {
     Reset: '\x1b[0m',
     Bright: '\x1b[1m',
@@ -26,10 +28,20 @@ exports.Color = {
     BgCyan: '\x1b[46m',
     BgWhite: '\x1b[47m',
 };
+/**
+ * Returns a styled string made of given values and color/style presets
+ * @param color A single/array of Color/Style Presets
+ * @param string Array of values to be printed
+ */
 function colorString(color, ...string) {
     return `${typeof color == 'string' ? color : color.join(' ')}${string.join(' ')}${exports.Color.Reset}`;
 }
 exports.colorString = colorString;
+/**
+ * Styles and prints the given values to the console and resets the console
+ * @param color A single/array of Color/Style Presets
+ * @param string Array of values to be printed
+ */
 function colorLog(color, ...string) {
     console.log(colorString(color, ...string));
 }

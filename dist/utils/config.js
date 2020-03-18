@@ -13,4 +13,3 @@ const config = {
     PGPORT: process.env.PGPORT,
 };
 exports.config = config;
-console.log(config.NODE_ENV);

@@ -3,6 +3,9 @@ import { logger } from './logger'
 import { DatabaseError } from './errors'
 
 const middleware = {
+  /**
+   * Logs the requests made to the server, for use during debugging/development
+   */
   requestLogger: (req: Request, res: Response, next: NextFunction): void => {
     logger.info('Request at: ', Date())
     logger.info('Method: ', req.method)
@@ -12,15 +15,24 @@ const middleware = {
     next()
   },
 
+  /**
+   * Changes the x-powered-by header in server responses   O.o
+   */
   xPoweredByHeader: (req: Request, res: Response, next: NextFunction): void => {
     res.header('X-powered-by', 'Tannhäuser Gate')
     next()
   },
 
+  /**
+   * Handles requests made to server at uknown endpoints
+   */
   unknownEndpoint: (req: Request, res: Response): void => {
     res.status(404).send({ message: 'Unknown Endpoint' })
   },
 
+  /**
+   * Handles any errors during processing a request. Add custom error handling here
+   */
   errorHandler: (error: Error, req: Request, res: Response, next: NextFunction): void => {
     logger.error(error.message)
 

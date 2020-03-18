@@ -1,5 +1,6 @@
-// console printing modifiers
-
+/**
+ * Color/Style Presets
+ */
 export const Color = {
   Reset: '\x1b[0m',
   Bright: '\x1b[1m',
@@ -28,10 +29,20 @@ export const Color = {
   BgWhite: '\x1b[47m',
 }
 
+/**
+ * Returns a styled string made of given values and color/style presets
+ * @param color A single/array of Color/Style Presets
+ * @param string Array of values to be printed
+ */
 export function colorString(color: string | string[], ...string: any[]): string {
   return `${typeof color == 'string' ? color : color.join(' ')}${string.join(' ')}${Color.Reset}`
 }
 
+/**
+ * Styles and prints the given values to the console and resets the console
+ * @param color A single/array of Color/Style Presets
+ * @param string Array of values to be printed
+ */
 export function colorLog(color: string | string[], ...string: any[]): void {
   console.log(colorString(color, ...string))
 }
