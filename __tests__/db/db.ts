@@ -3,6 +3,10 @@ import { database } from '../../src/db/db'
 describe('Database interface', () => {
   jest.useFakeTimers()
 
+  beforeAll(() => {
+    database.connect()
+  })
+
   test('Single Query', async () => {
     expect(database.totalCount()).toBe(0)
     const res = await database.query('SELECT * FROM vn', [])

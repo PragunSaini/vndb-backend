@@ -2,8 +2,10 @@ import { Pool, QueryResult, PoolClient, PoolConfig, Submittable } from 'pg'
 import { logger } from '../utils/logger'
 import { config } from '../utils/config'
 
+// Get the database conenction settings
 const { PGHOST, PGUSER, PGDATABASE, PGPASSWORD, PGPORT } = config
 
+// Database connection object
 const dbconfig: PoolConfig = {
   user: PGUSER as string,
   host: PGHOST as string,
@@ -12,18 +14,40 @@ const dbconfig: PoolConfig = {
   port: PGPORT as number,
 }
 
-const pool = new Pool(dbconfig)
+// A pool of database conenctions
+let pool: Pool
 
+/**
+ * A database object, for querying the database
+ */
 const database = {
+  /**
+   * Connect to the database
+   */
+  connect: (): void => {
+    pool = new Pool(dbconfig)
+  },
+  /**
+   * Returns total number of clients in the pool
+   */
   totalCount: (): number => {
     return pool.totalCount
   },
+  /**
+   * Returns number of clients not checked out
+   */
   idleCount: (): number => {
     return pool.idleCount
   },
+  /**
+   * Returns number of queued requests
+   */
   waitingCount: (): number => {
     return pool.waitingCount
   },
+  /**
+   * Run a query on the database
+   */
   query: async (text: string, params: any[]): Promise<QueryResult<any>> => {
     const start = Date.now()
     const res = await pool.query(text, params)
@@ -31,6 +55,9 @@ const database = {
     logger.query(text, start, end)
     return res
   },
+  /**
+   * Get a client from the pool, which can be used to run queries
+   */
   getClient: async (): Promise<PoolClient> => {
     const client: PoolClient & { lastQuery?: any[] } = await pool.connect()
     const query = client.query
@@ -65,7 +92,10 @@ const database = {
 
     return client
   },
-  end: pool.end.bind(pool) as () => Promise<void>,
+  /**
+   * End the database connection and destroy the pool
+   */
+  end: (): Promise<void> => pool.end(),
 }
 
 export { database }

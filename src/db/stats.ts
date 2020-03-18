@@ -1,8 +1,19 @@
 import { database } from './db'
-import { QueryResult } from 'pg'
+interface DBStats {
+  vn: number
+  tags: number
+  releases: number
+  producers: number
+  staff: number
+  characters: number
+  traits: number
+}
 
-const dbstats = async (): Promise<object> => {
-  const dbstats = {
+/**
+ * Get the statistics related to the VNDB database
+ */
+const dbstats = async (): Promise<DBStats> => {
+  const dbstats: DBStats = {
     vn: 0,
     tags: 0,
     releases: 0,
@@ -11,22 +22,24 @@ const dbstats = async (): Promise<object> => {
     characters: 0,
     traits: 0,
   }
-  let res: QueryResult<any>
-  res = await database.query('SELECT COUNT(id) FROM vn', [])
-  dbstats.vn = res.rows[0].count
-  res = await database.query('SELECT COUNT(id) FROM tags', [])
-  dbstats.tags = res.rows[0].count
-  res = await database.query('SELECT COUNT(id) FROM releases', [])
-  dbstats.releases = res.rows[0].count
-  res = await database.query('SELECT COUNT(id) FROM producers', [])
-  dbstats.producers = res.rows[0].count
-  res = await database.query('SELECT COUNT(id) FROM staff', [])
-  dbstats.staff = res.rows[0].count
-  res = await database.query('SELECT COUNT(id) FROM chars', [])
-  dbstats.characters = res.rows[0].count
-  res = await database.query('SELECT COUNT(id) FROM traits', [])
-  dbstats.traits = res.rows[0].count
 
+  const result = await Promise.all([
+    database.query('SELECT COUNT(id) FROM vn', []),
+    database.query('SELECT COUNT(id) FROM tags', []),
+    database.query('SELECT COUNT(id) FROM releases', []),
+    database.query('SELECT COUNT(id) FROM producers', []),
+    database.query('SELECT COUNT(id) FROM staff', []),
+    database.query('SELECT COUNT(id) FROM chars', []),
+    database.query('SELECT COUNT(id) FROM traits', []),
+  ])
+
+  dbstats.vn = result[0].rows[0].count
+  dbstats.tags = result[0].rows[0].count
+  dbstats.releases = result[0].rows[0].count
+  dbstats.producers = result[0].rows[0].count
+  dbstats.staff = result[0].rows[0].count
+  dbstats.characters = result[0].rows[0].count
+  dbstats.traits = result[0].rows[0].count
   return dbstats
 }
 
