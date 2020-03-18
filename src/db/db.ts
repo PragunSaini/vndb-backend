@@ -18,15 +18,23 @@ const dbconfig: PoolConfig = {
 let pool: Pool
 
 /**
+ * Connect to the database
+ */
+function connectDB(): void {
+  pool = new Pool(dbconfig)
+}
+
+/**
+ * End the database connection and destroy the pool
+ */
+function endDB(): Promise<void> {
+  return pool.end()
+}
+
+/**
  * A database object, for querying the database
  */
 const database = {
-  /**
-   * Connect to the database
-   */
-  connect: (): void => {
-    pool = new Pool(dbconfig)
-  },
   /**
    * Returns total number of clients in the pool
    */
@@ -92,10 +100,6 @@ const database = {
 
     return client
   },
-  /**
-   * End the database connection and destroy the pool
-   */
-  end: (): Promise<void> => pool.end(),
 }
 
-export { database }
+export { connectDB, database, endDB }

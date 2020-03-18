@@ -3,6 +3,9 @@ import express from 'express'
 import cors from 'cors'
 import bodyParser from 'body-parser'
 
+// Import database stuff
+import { connectDB } from './db/db'
+
 // Imports utils
 import { middleware } from './utils/middleware'
 import { config } from './utils/config'
@@ -27,7 +30,8 @@ app.use('/vn', vnRouter)
 app.use(middleware.unknownEndpoint)
 app.use(middleware.errorHandler)
 
-// Start the server
+// Connect to the database and Start the server
+connectDB()
 app.listen(config.PORT, () => {
   logger.info(`Listening on PORT ${config.PORT} ...\n`)
 })

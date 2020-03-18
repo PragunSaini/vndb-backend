@@ -1,10 +1,10 @@
-import { database } from '../../src/db/db'
+import { connectDB, endDB, database } from '../../src/db/db'
 
 describe('Database interface', () => {
   jest.useFakeTimers()
 
   beforeAll(() => {
-    database.connect()
+    connectDB()
   })
 
   test('Single Query', async () => {
@@ -36,6 +36,6 @@ describe('Database interface', () => {
   })
 
   afterAll(async () => {
-    await database.end()
+    await endDB()
   })
 })
