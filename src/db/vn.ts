@@ -13,11 +13,12 @@ interface VNResult {
   screenshots?: any[]
   tags?: any[]
   chars?: any[]
+  releaseinfo?: any[]
 }
 
 async function getWikidata(wikiId: number): Promise<any> {
   const res = await database.query('SELECT * FROM wikidata WHERE id = $1', [wikiId])
-  return res.rows[0]
+  return res.rows.length > 0 ? res.rows[0] : null
 }
 
 async function getStaff(vnid: number): Promise<any> {
@@ -126,6 +127,20 @@ async function getAnime(vnid: number): Promise<any> {
   return res.rows.length > 0 ? res.rows : null
 }
 
+async function getReleaseInfo(vnid: number): Promise<any> {
+  const res = await database.query(
+    'SELECT lang, released FROM \
+      (Select lang, released, row_number() OVER (ORDER BY released ASC) AS rn \
+      FROM releases \
+      INNER JOIN releases_vn USING(id) \
+      INNER JOIN releases_lang USING(id) \
+      WHERE vid = $1) as list WHERE rn = 1',
+    [vnid]
+  )
+
+  return res.rows.length > 0 ? res.rows[0] : null
+}
+
 /**
  * Get's all the metadata related to the requested VN
  * @param id Visual Novel's VNDB id
@@ -148,6 +163,9 @@ const getvn = async (id: number): Promise<VNResult> => {
   } else {
     vnresult.wikidata = null
   }
+
+  // Get the release info
+  promises.push(getReleaseInfo(id))
 
   // Get the staff details for this vn
   promises.push(getStaff(id))
@@ -179,6 +197,7 @@ const getvn = async (id: number): Promise<VNResult> => {
   if (vnresult.vn.l_wikidata) {
     ;[
       vnresult.wikidata,
+      vnresult.releaseinfo,
       vnresult.staff,
       vnresult.relations,
       vnresult.anime,
@@ -191,6 +210,7 @@ const getvn = async (id: number): Promise<VNResult> => {
     ] = await Promise.all(promises)
   } else {
     ;[
+      vnresult.releaseinfo,
       vnresult.staff,
       vnresult.relations,
       vnresult.anime,
