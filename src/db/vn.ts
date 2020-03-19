@@ -1,6 +1,5 @@
 import { database } from './db'
 import { DatabaseError } from '../utils/errors'
-import { logger } from '../utils/logger'
 
 interface VNResult {
   vn?: any
@@ -127,6 +126,10 @@ async function getAnime(vnid: number): Promise<any> {
   return res.rows.length > 0 ? res.rows : null
 }
 
+/**
+ * Get's all the metadata related to the requested VN
+ * @param id Visual Novel's VNDB id
+ */
 const getvn = async (id: number): Promise<VNResult> => {
   const vnresult: VNResult = {}
 
@@ -204,6 +207,3 @@ const getvn = async (id: number): Promise<VNResult> => {
 }
 
 export { getvn }
-
-// TODO
-// characters

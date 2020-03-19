@@ -3,8 +3,9 @@ import express from 'express'
 import cors from 'cors'
 import bodyParser from 'body-parser'
 
-// Import database stuff
+// Import connections
 import { connectDB } from './db/db'
+import { startRedis } from './utils/redis'
 
 // Imports utils
 import { middleware } from './utils/middleware'
@@ -30,8 +31,11 @@ app.use('/vn', vnRouter)
 app.use(middleware.unknownEndpoint)
 app.use(middleware.errorHandler)
 
-// Connect to the database and Start the server
+// Connect to the database and redis
 connectDB()
+startRedis()
+
+// Start the server
 app.listen(config.PORT, () => {
   logger.info(`Listening on PORT ${config.PORT} ...\n`)
 })
