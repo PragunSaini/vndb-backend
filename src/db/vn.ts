@@ -1,5 +1,7 @@
 import { database } from './db'
 import { DatabaseError } from '../utils/errors'
+import { groupBy } from '../utils/groupby'
+import { logger } from '../utils/logger'
 
 interface VNResult {
   vn?: any
@@ -7,7 +9,7 @@ interface VNResult {
   staff?: any[]
   relations?: any[]
   anime?: any[]
-  producers?: any[]
+  publishers?: any[]
   developers?: any[]
   releases?: any[]
   screenshots?: any[]
@@ -23,15 +25,21 @@ async function getWikidata(wikiId: number): Promise<any> {
 
 async function getStaff(vnid: number): Promise<any> {
   const res = await database.query(
-    'SELECT vst.aid, st.id, vst.role, vst.note, sta.name, sta.original\
-    FROM vn_staff vst JOIN staff st USING(aid) JOIN staff_alias sta USING(aid)\
+    'SELECT vst.aid, sta.id, vst.role, vst.note, sta.name, sta.original\
+    FROM vn_staff vst INNER JOIN staff_alias sta USING(aid)\
     WHERE vst.id = $1',
     [vnid]
   )
+
+  if (res.rows.length > 0) {
+    const groupedByRole = groupBy(res.rows, 'role')
+    return groupedByRole
+  }
+
   return res.rows.length > 0 ? res.rows : null
 }
 
-async function getProducers(vnid: number): Promise<any> {
+async function getPublishers(vnid: number): Promise<any> {
   const res = await database.query(
     'SELECT DISTINCT rprod.pid, prod.name, rlang.lang\
     FROM releases_vn rvn JOIN releases_producers rprod ON rvn.id = rprod.id\
@@ -40,7 +48,12 @@ async function getProducers(vnid: number): Promise<any> {
     WHERE rvn.vid = $1 AND rprod.publisher',
     [vnid]
   )
-  return res.rows.length > 0 ? res.rows : null
+
+  if (res.rows.length > 0) {
+    const groupedByLang = groupBy(res.rows, 'lang')
+    return groupedByLang
+  }
+  return null
 }
 
 async function getDevelopers(vnid: number): Promise<any> {
@@ -62,21 +75,38 @@ async function getRelations(vnid: number): Promise<any> {
     WHERE vn1.id = $1',
     [vnid]
   )
-  return res.rows.length > 0 ? res.rows : null
+
+  if (res.rows.length > 0) {
+    const groupedByRelation = groupBy(res.rows, 'relation')
+    return groupedByRelation
+  }
+
+  return null
 }
 
 async function getReleases(vnid: number): Promise<any> {
   const res = await database.query(
-    'SELECT r.*, rlan.*, rprod.*, rplat.*, rmed.* FROM \
-    releases r INNER JOIN releases_vn rvn ON r.id = rvn.id \
-    INNER JOIN releases_media rmed ON r.id = rmed.id \
-    INNER JOIN releases_platforms rplat ON r.id = rplat.id \
-    INNER JOIN releases_producers rprod ON r.id = rprod.id \
-    INNER JOIN releases_lang rlan ON r.id = rlan.id \
-    WHERE rvn.vid = $1',
+    'SELECT rv.vid, rel.*, rel.id, rlang.lang, rmed.medium, rmed.qty, rplat.platform \
+    FROM releases rel \
+    INNER JOIN releases_vn rv ON rel.id = rv.id \
+    LEFT JOIN releases_lang rlang ON rel.id = rlang.id \
+    LEFT JOIN releases_media rmed ON rel.id = rmed.id \
+    LEFT JOIN releases_platforms rplat ON rel.id = rplat.id \
+    WHERE rv.vid = $1',
     [vnid]
   )
-  return res.rows.length > 0 ? res.rows : null
+
+  if (res.rows.length > 0) {
+    const groupByLang = groupBy(res.rows, 'lang')
+    return groupByLang.map(group => {
+      if (group.lang == 'en') {
+        group.rows.forEach(r => logger.info(r.title, r.id))
+      }
+      return { ...group, rows: groupBy(group.rows, 'id') }
+    })
+  }
+
+  return null
 }
 
 async function getScreenshots(vnid: number): Promise<any> {
@@ -86,7 +116,12 @@ async function getScreenshots(vnid: number): Promise<any> {
     WHERE vs.id = $1',
     [vnid]
   )
-  return res.rows.length > 0 ? res.rows : null
+
+  if (res.rows.length > 0) {
+    const groupByRelease = groupBy(res.rows, 'rid')
+    return groupByRelease
+  }
+  return null
 }
 
 async function getTags(vnid: number): Promise<any> {
@@ -116,7 +151,12 @@ async function getChars(vnid: number): Promise<any> {
     [vnid]
   )
 
-  return res.rows.length > 0 ? res.rows : null
+  if (res.rows.length > 0) {
+    const groupByChar = groupBy(res.rows, 'id')
+    return groupByChar
+  }
+
+  return null
 }
 
 async function getAnime(vnid: number): Promise<any> {
@@ -177,7 +217,7 @@ const getvn = async (id: number): Promise<VNResult> => {
   promises.push(getAnime(id))
 
   // Get the producers list by language
-  promises.push(getProducers(id))
+  promises.push(getPublishers(id))
 
   // Get the developers list
   promises.push(getDevelopers(id))
@@ -201,7 +241,7 @@ const getvn = async (id: number): Promise<VNResult> => {
       vnresult.staff,
       vnresult.relations,
       vnresult.anime,
-      vnresult.producers,
+      vnresult.publishers,
       vnresult.developers,
       vnresult.releases,
       vnresult.screenshots,
@@ -214,7 +254,7 @@ const getvn = async (id: number): Promise<VNResult> => {
       vnresult.staff,
       vnresult.relations,
       vnresult.anime,
-      vnresult.producers,
+      vnresult.publishers,
       vnresult.developers,
       vnresult.releases,
       vnresult.screenshots,
