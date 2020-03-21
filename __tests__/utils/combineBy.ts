@@ -1,4 +1,4 @@
-import { combineBY } from '../../src/utils/helpers'
+import { combineBy } from '../../src/utils/helpers'
 
 describe('combineBy helper', () => {
   const mock = [
@@ -15,12 +15,12 @@ describe('combineBy helper', () => {
   ]
 
   test('Just combine by id', () => {
-    const res = combineBY(mock, 'id')
+    const res = combineBy(mock, 'id')
     expect(res.length).toBe(3)
   })
 
   test('Combine by id, merge lang', () => {
-    const res = combineBY(mock, 'id', 'lang')
+    const res = combineBy(mock, 'id', 'lang')
     expect(res.length).toBe(3)
     res.forEach(obj => {
       switch (obj.id) {
@@ -38,7 +38,7 @@ describe('combineBy helper', () => {
   })
 
   test('Combine by id, merge lang and rid', () => {
-    const res = combineBY(mock, 'id', 'lang', 'rid')
+    const res = combineBy(mock, 'id', 'lang', 'rid')
     expect(res.length).toBe(3)
     res.forEach(obj => {
       switch (obj.id) {

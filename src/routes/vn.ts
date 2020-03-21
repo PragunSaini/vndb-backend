@@ -12,7 +12,7 @@ vnRouter.get('/', async (req, res) => {
 vnRouter.get('/:id', async (req, res, next) => {
   try {
     const vnid = parseInt(req.params.id, 10)
-    if (/*await redis.exists(`v${vnid}`)*/ vnid == undefined) {
+    if (await redis.exists(`v${vnid}`)) {
       res.json(JSON.parse((await redis.get(`v${vnid}`)) as string))
     } else {
       const data = await getvn(vnid)

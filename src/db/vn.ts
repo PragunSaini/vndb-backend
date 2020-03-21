@@ -1,7 +1,6 @@
 import { database } from './db'
 import { DatabaseError } from '../utils/errors'
-import { groupBy } from '../utils/helpers'
-import { logger } from '../utils/logger'
+import { groupBy, combineBy } from '../utils/helpers'
 
 interface VNResult {
   vn?: any
@@ -98,12 +97,10 @@ async function getReleases(vnid: number): Promise<any> {
 
   if (res.rows.length > 0) {
     const groupByLang = groupBy(res.rows, 'lang')
-    return groupByLang.map(group => {
-      if (group.lang == 'en') {
-        group.rows.forEach(r => logger.info(r.title, r.id))
-      }
-      return { ...group, rows: groupBy(group.rows, 'id') }
+    const combineByRelease = groupByLang.map(group => {
+      return { ...group, rows: combineBy(group.rows, 'id', 'medium', 'qty', 'platform') }
     })
+    return combineByRelease
   }
 
   return null

@@ -50,7 +50,7 @@ type ArrayOrValue<T, K extends keyof T> = {
  * @param keys the keys of properties that will be combined
  * @returns array of unique objects, with properties combined
  */
-export function combineBY<T, K extends keyof T, U extends (keyof T)[]>(
+export function combineBy<T, K extends keyof T, U extends (keyof T)[]>(
   array: T[],
   id: K,
   ...keys: U
