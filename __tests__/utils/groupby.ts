@@ -1,6 +1,6 @@
-import { groupBy } from '../../src/utils/groupby'
+import { groupBy } from '../../src/utils/helpers'
 
-describe('groupBy key function', () => {
+describe('groupBy helper', () => {
   const mock = [
     { id: 1, names: 'deckard', rid: 144, lang: 'en' },
     { id: 1, names: 'rachel', rid: 122, lang: 'en' },

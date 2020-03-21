@@ -1,6 +1,6 @@
 import { database } from './db'
 import { DatabaseError } from '../utils/errors'
-import { groupBy } from '../utils/groupby'
+import { groupBy } from '../utils/helpers'
 import { logger } from '../utils/logger'
 
 interface VNResult {
