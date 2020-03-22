@@ -1,4 +1,4 @@
-import { database } from './db'
+import { getDB, Database } from './db'
 import { DatabaseError } from '../utils/errors'
 import { groupBy, combineBy } from '../utils/helpers'
 
@@ -17,12 +17,12 @@ interface VNResult {
   releaseinfo?: any[]
 }
 
-async function getWikidata(wikiId: number): Promise<any> {
+async function getWikidata(wikiId: number, database: Database): Promise<any> {
   const res = await database.query('SELECT * FROM wikidata WHERE id = $1', [wikiId])
   return res.rows.length > 0 ? res.rows[0] : null
 }
 
-async function getStaff(vnid: number): Promise<any> {
+async function getStaff(vnid: number, database: Database): Promise<any> {
   const res = await database.query(
     'SELECT vst.aid, sta.id, vst.role, vst.note, sta.name, sta.original\
     FROM vn_staff vst INNER JOIN staff_alias sta USING(aid)\
@@ -38,7 +38,7 @@ async function getStaff(vnid: number): Promise<any> {
   return res.rows.length > 0 ? res.rows : null
 }
 
-async function getPublishers(vnid: number): Promise<any> {
+async function getPublishers(vnid: number, database: Database): Promise<any> {
   const res = await database.query(
     'SELECT DISTINCT rprod.pid, prod.name, rlang.lang\
     FROM releases_vn rvn JOIN releases_producers rprod ON rvn.id = rprod.id\
@@ -55,7 +55,7 @@ async function getPublishers(vnid: number): Promise<any> {
   return null
 }
 
-async function getDevelopers(vnid: number): Promise<any> {
+async function getDevelopers(vnid: number, database: Database): Promise<any> {
   const res = await database.query(
     'SELECT DISTINCT rprod.pid, prod.name\
     FROM releases_vn rvn JOIN releases_producers rprod ON rvn.id = rprod.id\
@@ -67,7 +67,7 @@ async function getDevelopers(vnid: number): Promise<any> {
   return res.rows.length > 0 ? res.rows : null
 }
 
-async function getRelations(vnid: number): Promise<any> {
+async function getRelations(vnid: number, database: Database): Promise<any> {
   const res = await database.query(
     'SELECT vn1.id AS "vid", vnr.relation, vnr.official, vn2.id, vn2.title\
     FROM vn vn1 JOIN vn_relations vnr ON vn1.id = vnr.vid JOIN vn vn2 ON vnr.id = vn2.id\
@@ -83,7 +83,7 @@ async function getRelations(vnid: number): Promise<any> {
   return null
 }
 
-async function getReleases(vnid: number): Promise<any> {
+async function getReleases(vnid: number, database: Database): Promise<any> {
   const res = await database.query(
     'SELECT rv.vid, rel.*, rel.id, rlang.lang, rmed.medium, rmed.qty, rplat.platform \
     FROM releases rel \
@@ -106,7 +106,7 @@ async function getReleases(vnid: number): Promise<any> {
   return null
 }
 
-async function getScreenshots(vnid: number): Promise<any> {
+async function getScreenshots(vnid: number, database: Database): Promise<any> {
   const res = await database.query(
     'SELECT * FROM vn_screenshots vs \
     INNER JOIN screenshots s ON vs.scr = s.id \
@@ -121,7 +121,7 @@ async function getScreenshots(vnid: number): Promise<any> {
   return null
 }
 
-async function getTags(vnid: number): Promise<any> {
+async function getTags(vnid: number, database: Database): Promise<any> {
   const res = await database.query(
     'SELECT t.id, t.name, tv.vid, tv.ignore, COUNT(tv.uid) AS "votes", \
             ROUND(AVG(tv.spoiler), 2) AS "spoiler", ROUND(AVG(vote), 1) AS "rating" \
@@ -134,7 +134,7 @@ async function getTags(vnid: number): Promise<any> {
   return res.rows.length > 0 ? res.rows : null
 }
 
-async function getChars(vnid: number): Promise<any> {
+async function getChars(vnid: number, database: Database): Promise<any> {
   const res = await database.query(
     'SELECT c.*, cv.*, sta.id AS "sei_id", sta.aid AS "sei_aid", \
             sta.name AS "sei_name", vs.note, \
@@ -156,7 +156,7 @@ async function getChars(vnid: number): Promise<any> {
   return null
 }
 
-async function getAnime(vnid: number): Promise<any> {
+async function getAnime(vnid: number, database: Database): Promise<any> {
   const res = await database.query(
     'Select * FROM anime JOIN vn_anime ON anime.id = vn_anime.aid WHERE vn_anime.id = $1',
     [vnid]
@@ -164,7 +164,7 @@ async function getAnime(vnid: number): Promise<any> {
   return res.rows.length > 0 ? res.rows : null
 }
 
-async function getReleaseInfo(vnid: number): Promise<any> {
+async function getReleaseInfo(vnid: number, database: Database): Promise<any> {
   const res = await database.query(
     'SELECT lang, released FROM \
       (Select lang, released, row_number() OVER (ORDER BY released ASC) AS rn \
@@ -184,6 +184,7 @@ async function getReleaseInfo(vnid: number): Promise<any> {
  */
 const getvn = async (id: number): Promise<VNResult> => {
   const vnresult: VNResult = {}
+  const database = await getDB()
 
   // Get the VN from the database if present
   const res = await database.query('SELECT * FROM vn WHERE id = $1', [id])
@@ -196,40 +197,40 @@ const getvn = async (id: number): Promise<VNResult> => {
 
   // If wikidata present, fetch it
   if (vnresult.vn.l_wikidata) {
-    promises.push(getWikidata(parseInt(vnresult.vn?.l_wikidata, 10)))
+    promises.push(getWikidata(parseInt(vnresult.vn?.l_wikidata, 10), database))
   } else {
     vnresult.wikidata = null
   }
 
   // Get the release info
-  promises.push(getReleaseInfo(id))
+  promises.push(getReleaseInfo(id, database))
 
   // Get the staff details for this vn
-  promises.push(getStaff(id))
+  promises.push(getStaff(id, database))
 
   // Get the relations to other vn
-  promises.push(getRelations(id))
+  promises.push(getRelations(id, database))
 
   // Get the related anime
-  promises.push(getAnime(id))
+  promises.push(getAnime(id, database))
 
   // Get the producers list by language
-  promises.push(getPublishers(id))
+  promises.push(getPublishers(id, database))
 
   // Get the developers list
-  promises.push(getDevelopers(id))
+  promises.push(getDevelopers(id, database))
 
   // Get the releases
-  promises.push(getReleases(id))
+  promises.push(getReleases(id, database))
 
   // Get screenshot ids
-  promises.push(getScreenshots(id))
+  promises.push(getScreenshots(id, database))
 
   // Get the tags
-  promises.push(getTags(id))
+  promises.push(getTags(id, database))
 
   // Get the characters
-  promises.push(getChars(id))
+  promises.push(getChars(id, database))
 
   if (vnresult.vn.l_wikidata) {
     ;[

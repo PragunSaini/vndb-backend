@@ -1,10 +1,12 @@
-import { connectDB, endDB, database } from '../../src/db/db'
+import { connectDB, getDB, endDB, Database } from '../../src/db/db'
 
 describe('Database interface', () => {
   jest.useFakeTimers()
+  let database: Database
 
-  beforeAll(() => {
+  beforeAll(async () => {
     connectDB()
+    database = await getDB()
   })
 
   test('Single Query', async () => {

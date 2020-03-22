@@ -1,4 +1,5 @@
-import { database } from './db'
+import { getDB } from './db'
+
 interface DBStats {
   vn: number
   tags: number
@@ -22,6 +23,8 @@ const dbstats = async (): Promise<DBStats> => {
     characters: 0,
     traits: 0,
   }
+
+  const database = await getDB()
 
   const result = await Promise.all([
     database.query('SELECT COUNT(id) FROM vn', []),

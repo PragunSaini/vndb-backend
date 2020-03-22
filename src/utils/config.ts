@@ -7,6 +7,7 @@ interface EnvConfig {
   PGHOST: string | number | undefined
   PGUSER: string | number | undefined
   PGDATABASE: string | number | undefined
+  PGBACKUPDATABASE: string | number | undefined
   PGPASSWORD: string | number | undefined
   PGPORT: string | number | undefined
 }
@@ -18,6 +19,7 @@ const config: EnvConfig = {
   PGHOST: process.env.PGHOST,
   PGUSER: process.env.PGUSER,
   PGDATABASE: process.env.PGDATABASE,
+  PGBACKUPDATABASE: process.env.PGBACKUPDATABASE,
   PGPASSWORD: process.env.PGPASSWORD,
   PGPORT: process.env.PGPORT,
 }
