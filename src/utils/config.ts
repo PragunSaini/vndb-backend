@@ -10,6 +10,7 @@ interface EnvConfig {
   PGBACKUPDATABASE: string | number | undefined
   PGPASSWORD: string | number | undefined
   PGPORT: string | number | undefined
+  REDISPORT: string | number | undefined
 }
 
 // Retrieve the env variables
@@ -22,6 +23,7 @@ const config: EnvConfig = {
   PGBACKUPDATABASE: process.env.PGBACKUPDATABASE,
   PGPASSWORD: process.env.PGPASSWORD,
   PGPORT: process.env.PGPORT,
+  REDISPORT: process.env.REDISPORT,
 }
 
 // Export them for use

@@ -1,4 +1,5 @@
 import Redis from 'ioredis'
+import { config } from './config'
 
 let redis: Redis.Redis
 
@@ -6,7 +7,7 @@ let redis: Redis.Redis
  * Connect to redis
  */
 function startRedis(): void {
-  redis = new Redis()
+  redis = new Redis(config.REDISPORT as number)
 }
 
 /**
