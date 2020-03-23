@@ -14,8 +14,10 @@ variables:
   REDISPORT: 6379
 
 services:
-  - redis:latest
-  - postgres:latest
+  - name: redis:latest
+    alias: redis
+  - name: postgres:latest
+    alias: postgres
 
 stages:
   - build
