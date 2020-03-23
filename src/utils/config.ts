@@ -11,6 +11,7 @@ interface EnvConfig {
   PGPASSWORD: string | number | undefined
   PGPORT: string | number | undefined
   REDISPORT: string | number | undefined
+  REDISHOST: string | number | undefined
 }
 
 // Retrieve the env variables
@@ -24,6 +25,7 @@ const config: EnvConfig = {
   PGPASSWORD: process.env.PGPASSWORD,
   PGPORT: process.env.PGPORT,
   REDISPORT: process.env.REDISPORT,
+  REDISHOST: process.env.REDISHOST,
 }
 
 // Export them for use

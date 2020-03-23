@@ -7,7 +7,7 @@ let redis: Redis.Redis
  * Connect to redis
  */
 function startRedis(): void {
-  redis = new Redis(config.REDISPORT as number)
+  redis = new Redis(config.REDISPORT as number, config.REDISHOST as string)
 }
 
 /**
