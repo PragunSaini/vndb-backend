@@ -1,0 +1,6 @@
+node_modules
+npm-debub.log
+dist
+docs
+*.sql
+*.rest
