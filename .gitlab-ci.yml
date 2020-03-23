@@ -1,0 +1,48 @@
+image: node:latest
+
+variables:
+  # Postgres variables, PG* - for server, POSTGRES* - for postgres image
+  PGHOST: 'postgres'
+  PGUSER: 'pragun'
+  POSTGRES_USER: 'pragun'
+  POSTGRES_HOST_AUTH_METHOD: trust
+  PGDATABASE: 'vndb'
+  PGBACKUPDATABASE: 'vndb_backup'
+  PGPORT: 5432
+  # Redis variables
+  REDISHOST: 'redis'
+  REDISPORT: 6379
+
+services:
+  - redis:latest
+  - postgres:latest
+
+stages:
+  - build
+  - test
+
+setup:
+  stage: .pre
+  script:
+    - apt update
+    - apt install -y curl tar zstd
+    - curl -L --output vndb.tar.zst https://dl.vndb.org/dump/vndb-db-latest.tar.zst
+    - tar -I zstd -xvf vndb.tar.zst
+    - apt install -y postgresql-client
+    - apt install -y redis-server
+    - redis-cli -h $REDISHOST -p $REDISPORT set database main
+    - createdb -h $PGHOST -p $PGPORT -U $PGUSER vndb
+    - createdb -h $PGHOST -p $PGPORT -U $PGUSER vndb_backup
+    - psql -h $PGHOST -p $PGPORT -U $PGUSER vndb < import.sql
+    - psql -h $PGHOST -p $PGPORT -U $PGUSER vndb_backup < import.sql
+
+build:
+  stage: build
+  script:
+    - npm install
+    - npm run build
+
+test:
+  stage: test
+  script:
+    - npm run test

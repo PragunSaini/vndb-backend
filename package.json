@@ -4,7 +4,7 @@
   "description": "Backend for the VNDB client.",
   "main": "dist/index.js",
   "scripts": {
-    "start": "npm run build && NODE_ENV=production node .",
+    "start": "NODE_ENV=production node .",
     "dev": "NODE_ENV=development node .",
     "watch": "tsc-watch --onSuccess \"npm run dev\"",
     "build": "rm -rf dist && tsc",
