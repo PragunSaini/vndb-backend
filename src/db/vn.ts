@@ -108,8 +108,9 @@ async function getReleases(vnid: number, database: Database): Promise<any> {
 
 async function getScreenshots(vnid: number, database: Database): Promise<any> {
   const res = await database.query(
-    'SELECT * FROM vn_screenshots vs \
-    INNER JOIN screenshots s ON vs.scr = s.id \
+    'SELECT scr, rid, width, height, nsfw \
+    FROM vn_screenshots vs \
+    INNER JOIN images im ON vs.scr = im.id \
     WHERE vs.id = $1',
     [vnid]
   )
@@ -223,7 +224,7 @@ const getvn = async (id: number): Promise<VNResult> => {
   // Get the releases
   promises.push(getReleases(id, database))
 
-  // Get screenshot ids
+  // // Get screenshot ids
   promises.push(getScreenshots(id, database))
 
   // Get the tags

@@ -37,12 +37,12 @@ const dbstats = async (): Promise<DBStats> => {
   ])
 
   dbstats.vn = result[0].rows[0].count
-  dbstats.tags = result[0].rows[0].count
-  dbstats.releases = result[0].rows[0].count
-  dbstats.producers = result[0].rows[0].count
-  dbstats.staff = result[0].rows[0].count
-  dbstats.characters = result[0].rows[0].count
-  dbstats.traits = result[0].rows[0].count
+  dbstats.tags = result[1].rows[0].count
+  dbstats.releases = result[2].rows[0].count
+  dbstats.producers = result[3].rows[0].count
+  dbstats.staff = result[4].rows[0].count
+  dbstats.characters = result[5].rows[0].count
+  dbstats.traits = result[6].rows[0].count
   return dbstats
 }
 
