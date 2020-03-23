@@ -9,7 +9,7 @@
     "watch": "tsc-watch --onSuccess \"npm run dev\"",
     "build": "rm -rf dist && tsc",
     "docs": "typedoc",
-    "test": "NODE_ENV=testing jest",
+    "test": "NODE_ENV=testing jest --coverage",
     "lint": "eslint . --ext .js,.ts",
     "format": "prettier --write \"src/**/*.ts\" \"src/**/*.js\""
   },

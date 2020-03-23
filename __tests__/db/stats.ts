@@ -2,6 +2,8 @@ import { dbstats } from '../../src/db/stats'
 import { connectDB, endDB } from '../../src/db/db'
 
 describe('DBstats', () => {
+  jest.setTimeout(30000)
+
   beforeAll(async () => {
     connectDB()
   })

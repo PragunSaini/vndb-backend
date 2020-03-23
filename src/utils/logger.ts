@@ -1,5 +1,5 @@
-// Custom implementation for modified console printing and logging
-import { Color, colorLog } from './colors'
+// Custom implementation for modified console printing and debugging
+import { Color, colorString } from './colors'
 import { config } from './config'
 
 /**
@@ -11,9 +11,9 @@ import { config } from './config'
 function query(text: string, start: number, end: number): void {
   if (config.NODE_ENV == 'development') {
     console.log()
-    colorLog(Color.FgYellow, `${new Date(start).toString()}`)
-    colorLog(Color.FgYellow, `Query: ${text}`)
-    colorLog(Color.FgYellow, `Time taken: ${end - start} ms`)
+    console.log(colorString(Color.FgYellow, `${new Date(start).toString()}`))
+    console.log(colorString(Color.FgYellow, `Query: ${text}`))
+    console.log(colorString(Color.FgYellow, `Time taken: ${end - start} ms`))
     console.log()
   }
 }
@@ -23,7 +23,9 @@ function query(text: string, start: number, end: number): void {
  * @param text error to be logged
  */
 function error(...text: any[]): void {
-  colorLog(Color.FgRed, ...text)
+  if (config.NODE_ENV == 'development' || config.NODE_ENV == 'testing') {
+    console.error(colorString(Color.FgRed, ...text))
+  }
 }
 
 /**
@@ -31,7 +33,9 @@ function error(...text: any[]): void {
  * @param text message to be logged
  */
 function log(...text: any[]): void {
-  colorLog(Color.FgGreen, ...text)
+  if (config.NODE_ENV == 'development') {
+    console.log(colorString(Color.FgGreen, ...text))
+  }
 }
 
 /**
@@ -39,7 +43,9 @@ function log(...text: any[]): void {
  * @param text information to be logged
  */
 function info(...text: any[]): void {
-  colorLog(Color.FgCyan, ...text)
+  if (config.NODE_ENV == 'development') {
+    console.info(colorString(Color.FgCyan, ...text))
+  }
 }
 
 export const logger = {

@@ -88,6 +88,7 @@ function createDB(pool: Pool): Database {
         return (res as unknown) as resultType
       }
 
+      // For use in development
       const timeout = setTimeout(() => {
         logger.error('A client has been checked out for more than 5 seconds!')
         logger.error(`The last executed query on this client was: ${client.lastQuery}`)

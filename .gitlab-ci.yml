@@ -1,50 +1,46 @@
 image: node:latest
 
 variables:
-  # Postgres variables, PG* - for server, POSTGRES* - for postgres image
-  PGHOST: 'postgres'
-  PGUSER: 'pragun'
-  POSTGRES_USER: 'pragun'
+  # For postgres
+  POSTGRES_DB: placeholder
+  POSTGRES_USER: pragun
+  POSTGRES_PASSWORD: $POSTGRES_PASSWORD
   POSTGRES_HOST_AUTH_METHOD: trust
-  PGDATABASE: 'vndb'
-  PGBACKUPDATABASE: 'vndb_backup'
-  PGPORT: 5432
-  # Redis variables
-  REDISHOST: 'redis'
-  REDISPORT: 6379
 
 services:
-  - name: redis:latest
-    alias: redis
-  - name: postgres:latest
-    alias: postgres
+  - postgres:latest
+  - redis:latest
 
 stages:
-  - build
   - test
 
-setup:
-  stage: .pre
-  script:
+tests:
+  stage: test
+
+  before_script:
     - apt update
-    - apt install -y curl tar zstd
+    - apt install -y curl tar zstd wget
     - curl -L --output vndb.tar.zst https://dl.vndb.org/dump/vndb-db-latest.tar.zst
     - tar -I zstd -xvf vndb.tar.zst
+    - ls
     - apt install -y postgresql-client
-    - apt install -y redis-server
-    - redis-cli -h $REDISHOST -p $REDISPORT set database main
-    - createdb -h $PGHOST -p $PGPORT -U $PGUSER vndb
-    - createdb -h $PGHOST -p $PGPORT -U $PGUSER vndb_backup
-    - psql -h $PGHOST -p $PGPORT -U $PGUSER vndb < import.sql
-    - psql -h $PGHOST -p $PGPORT -U $PGUSER vndb_backup < import.sql
+    - export PGPASSWORD=$POSTGRES_PASSWORD
+    - psql --version
+    - psql -h postgres -U $POSTGRES_USER -d $POSTGRES_DB -c "SELECT VERSION();"
+    - psql -h postgres -U $POSTGRES_USER -d $POSTGRES_DB -c "CREATE DATABASE vndb;"
+    - psql -h postgres -U $POSTGRES_USER -d $POSTGRES_DB -c "CREATE DATABASE vndb_backup"
+    - psql -h postgres -U $POSTGRES_USER vndb < import.sql
+    - psql -h postgres -U $POSTGRES_USER vndb_backup < import.sql
+    # NOW SET SERVER ENV VARIABLES
+    - export PGHOST=postgres
+    - export PGUSER=$POSTGRES_USER
+    - export PGPASSWORD=$POSTGRES_PASSWORD
+    - export PGDATABASE=vndb
+    - export PGBACKUPDATABASE=vndb_backup
+    - export PGPORT=5432
+    - export REDISHOST=redis
+    - export REDISPORT=6379
 
-build:
-  stage: build
   script:
     - npm install
-    - npm run build
-
-test:
-  stage: test
-  script:
-    - npm run test
+  #   - npm run test

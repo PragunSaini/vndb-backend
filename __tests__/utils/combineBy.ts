@@ -6,8 +6,8 @@ describe('combineBy helper', () => {
     { id: 1, lang: 'ja', name: 'A', rid: 13 },
     { id: 1, lang: 'vi', name: 'C', rid: 13 },
     { id: 1, lang: 'ru', name: 'D', rid: 13 },
-    { id: 3, lang: 'en', name: 'E', rid: 13 },
-    { id: 3, lang: 'ja', name: 'F', rid: 13 },
+    { id: 3, lang: 'en', name: 'E' },
+    { id: 3, lang: 'ja', name: 'F' },
     { id: 2, lang: 'en', name: 'G', rid: 13 },
     { id: 2, lang: 'ja', name: 'H', rid: 13 },
     { id: 2, lang: 'ch', name: 'I', rid: 13 },
@@ -44,15 +44,15 @@ describe('combineBy helper', () => {
       switch (obj.id) {
         case 1:
           expect(obj.lang.length).toBe(4)
-          expect(obj.rid.length).toBe(1)
+          expect(obj.rid?.length).toBe(1)
           break
         case 2:
           expect(obj.lang.length).toBe(4)
-          expect(obj.rid.length).toBe(1)
+          expect(obj.rid?.length).toBe(1)
           break
         case 3:
           expect(obj.lang.length).toBe(2)
-          expect(obj.rid.length).toBe(1)
+          expect(obj.rid?.length).toBe(0)
           break
       }
     })

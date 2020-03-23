@@ -10,7 +10,6 @@ import { startRedis } from './utils/redis'
 // Imports utils
 import { middleware } from './utils/middleware'
 import { config } from './utils/config'
-import { logger } from './utils/logger'
 
 // Import routes
 import { vnRouter } from './routes/vn'
@@ -37,5 +36,5 @@ startRedis()
 
 // Start the server
 app.listen(config.PORT, () => {
-  logger.info(`Listening on PORT ${config.PORT} ...\n`)
+  console.info(`Listening on PORT ${config.PORT} ...\n`)
 })
