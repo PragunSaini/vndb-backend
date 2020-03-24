@@ -1,7 +1,6 @@
 image: node:latest
 
 variables:
-  # For postgres
   POSTGRES_DB: placeholder
   POSTGRES_USER: pragun
   POSTGRES_PASSWORD: $POSTGRES_PASSWORD
@@ -17,20 +16,28 @@ stages:
 tests:
   stage: test
 
+  cache:
+    paths:
+      - node_modules/**/*
+
   before_script:
     - apt update
-    - apt install -y curl tar zstd wget
+    - apt install -y curl tar zstd wget postgresql-client
+    - mkdir loaddb
+    - cd loaddb
     - curl -L --output vndb.tar.zst https://dl.vndb.org/dump/vndb-db-latest.tar.zst
-    - tar -I zstd -xvf vndb.tar.zst
+    - tar -I zstd -xvf vndb.tar.zst > /dev/null
     - ls
-    - apt install -y postgresql-client
     - export PGPASSWORD=$POSTGRES_PASSWORD
     - psql --version
     - psql -h postgres -U $POSTGRES_USER -d $POSTGRES_DB -c "SELECT VERSION();"
     - psql -h postgres -U $POSTGRES_USER -d $POSTGRES_DB -c "CREATE DATABASE vndb;"
     - psql -h postgres -U $POSTGRES_USER -d $POSTGRES_DB -c "CREATE DATABASE vndb_backup"
-    - psql -h postgres -U $POSTGRES_USER vndb < import.sql
-    - psql -h postgres -U $POSTGRES_USER vndb_backup < import.sql
+    - psql -h postgres -U $POSTGRES_USER vndb < import.sql > /dev/null
+    - psql -h postgres -U $POSTGRES_USER vndb_backup < import.sql > /dev/null
+    - cd ..
+    - rm -rf loaddb
+    - ls
     # NOW SET SERVER ENV VARIABLES
     - export PGHOST=postgres
     - export PGUSER=$POSTGRES_USER
@@ -43,4 +50,4 @@ tests:
 
   script:
     - npm install
-  #   - npm run test
+    - npm test
