@@ -1,0 +1,31 @@
+version: '3.7'
+services:
+  server:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      PORT: 8000
+      PGHOST: postgres
+      PGUSER: postgres
+      PGDATABASE: vndb
+      PGBACKUPDATABASE: vndb_backup
+      PGPASSWORD: $PGPASSWORD
+      PGPORT: 5432
+      REDISHOST: redis
+      REDISPORT: 6379
+    ports:
+      - '8000:8000'
+    depends_on:
+      - redis
+      - postgres
+  redis:
+    image: redis
+    ports:
+      - '6379:6379'
+  postgres:
+    image: postgres
+    environment:
+      POSTGRES_PASSWORD: $PGPASSWORD
+    ports:
+      - '5432:5432'
