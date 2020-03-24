@@ -3,3 +3,7 @@
 # vndb-backend
 
 Backend for the VNDB client.
+
+### This image is available on dockerhub as
+
+goavalon/vndb-backend
