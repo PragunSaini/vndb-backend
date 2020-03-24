@@ -1,4 +1,4 @@
-image: docker:latest
+image: node:latest
 
 variables:
   POSTGRES_DB: placeholder
@@ -16,7 +16,6 @@ services:
 stages:
   - test
   - build
-  - deploy
 
 tests:
   stage: test
@@ -58,6 +57,8 @@ tests:
     - npm test
 
 build:
+  image: docker:latest
+
   stage: build
 
   before_script:
@@ -67,17 +68,3 @@ build:
     - docker login -u $DOCKER_USER -p $DOCKER_PASS
     - docker build -t index.docker.io/$DOCK_USER/vndb-backend .
     - docker push index.docker.io/$DOCK_USER/vndb-backend
-
-deploy:
-  stage: deploy
-
-  before_script:
-    - apt update
-    - apt install -y python
-    - pip install -U pip
-    - pip install awscli
-
-  script:
-    - aws configure set aws_access_key_id $AWS_ACCESS_KEY_ID
-    - aws configure set aws_secret_access_key $AWS_SECRET_ACCESS_KEY
-    - aws ssm describe-instance-information --instance-information-filter-list key=InstanceIds,valueSet=i-0a690fb050c0e8ab1
