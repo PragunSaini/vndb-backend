@@ -20,6 +20,9 @@ stages:
 tests:
   stage: test
 
+  only:
+    - master
+
   cache:
     paths:
       - node_modules/**/*
@@ -60,6 +63,9 @@ build:
   image: docker:latest
 
   stage: build
+
+  only:
+    - master
 
   before_script:
     - docker version
