@@ -1,8 +1,7 @@
 version: '3.7'
 services:
   server:
-    build:
-      image: goavalon/vndb-backend
+    image: goavalon/vndb-backend
     environment:
       PORT: 8000
       PGHOST: postgres
@@ -26,5 +25,7 @@ services:
     image: postgres
     environment:
       POSTGRES_PASSWORD: $PGPASSWORD
+    volumes:
+      - ./dump:/dump
     ports:
       - '5432:5432'
