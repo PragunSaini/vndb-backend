@@ -5,3 +5,4 @@ coverage
 *.sql
 dist/
 docs/
+*.txt
