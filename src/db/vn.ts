@@ -1,6 +1,7 @@
 import { getDB, Database } from '../utils/db'
 import { DatabaseError } from '../utils/errors'
 import { groupBy, combineBy } from '../utils/helpers'
+import { mapAnimeType } from '../utils/mappers'
 
 interface VNResult {
   vn?: any
@@ -162,7 +163,18 @@ async function getAnime(vnid: number, database: Database): Promise<any> {
     'Select * FROM anime JOIN vn_anime ON anime.id = vn_anime.aid WHERE vn_anime.id = $1',
     [vnid]
   )
-  return res.rows.length > 0 ? res.rows : null
+
+  if (res.rows.length > 0) {
+    res.rows.forEach(anime => {
+      if (anime.type) {
+        mapAnimeType(anime, 'type')
+      }
+    })
+
+    return res.rows
+  }
+
+  return null
 }
 
 async function getReleaseInfo(vnid: number, database: Database): Promise<any> {
