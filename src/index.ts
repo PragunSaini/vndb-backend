@@ -4,7 +4,7 @@ import cors from 'cors'
 import bodyParser from 'body-parser'
 
 // Import connections
-import { connectDB } from './db/db'
+import { connectDB } from './utils/db'
 import { startRedis } from './utils/redis'
 
 // Imports utils

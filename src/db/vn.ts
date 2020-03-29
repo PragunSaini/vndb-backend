@@ -1,4 +1,4 @@
-import { getDB, Database } from './db'
+import { getDB, Database } from '../utils/db'
 import { DatabaseError } from '../utils/errors'
 import { groupBy, combineBy } from '../utils/helpers'
 

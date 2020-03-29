@@ -1,4 +1,4 @@
-import { connectDB, getDB, endDB, Database } from '../../src/db/db'
+import { connectDB, getDB, endDB, Database } from '../../src/utils/db'
 
 describe('Database interface', () => {
   jest.useFakeTimers()

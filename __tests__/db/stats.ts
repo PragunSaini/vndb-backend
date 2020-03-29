@@ -1,5 +1,5 @@
 import { dbstats } from '../../src/db/stats'
-import { connectDB, endDB } from '../../src/db/db'
+import { connectDB, endDB } from '../../src/utils/db'
 
 describe('DBstats', () => {
   jest.setTimeout(30000)

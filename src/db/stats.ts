@@ -1,4 +1,4 @@
-import { getDB } from './db'
+import { getDB } from '../utils/db'
 
 interface DBStats {
   vn: number

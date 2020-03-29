@@ -1,4 +1,4 @@
-import { connectDB, getDB, endDB } from '../../src/db/db'
+import { connectDB, getDB, endDB } from '../../src/utils/db'
 import { startRedis, killRedis, redis } from '../../src/utils/redis'
 
 describe('Database with redis based switching', () => {

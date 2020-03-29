@@ -1,7 +1,7 @@
 import { Pool, QueryResult, PoolClient, PoolConfig, Submittable } from 'pg'
-import { logger } from '../utils/logger'
-import { config } from '../utils/config'
-import { redis } from '../utils/redis'
+import { logger } from './logger'
+import { config } from './config'
+import { redis } from './redis'
 
 // Get the database conenction settings
 const { PGHOST, PGUSER, PGDATABASE, PGBACKUPDATABASE, PGPASSWORD, PGPORT } = config
