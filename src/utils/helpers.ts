@@ -66,7 +66,7 @@ export function combineBy<T, K extends keyof T, U extends (keyof T)[]>(
     } else {
       hashmap[JSON.stringify(obj[id])] = obj
       keys.forEach(key => {
-        if (hashmap[JSON.stringify(obj[id])][key]) {
+        if (hashmap[JSON.stringify(obj[id])][key] != undefined) {
           const temp = hashmap[JSON.stringify(obj[id])][key]
           hashmap[JSON.stringify(obj[id])][key] = new Set()
           hashmap[JSON.stringify(obj[id])][key].add(temp)

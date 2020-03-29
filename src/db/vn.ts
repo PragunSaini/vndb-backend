@@ -150,7 +150,7 @@ async function getChars(vnid: number, database: Database): Promise<any> {
   )
 
   if (res.rows.length > 0) {
-    const groupByChar = groupBy(res.rows, 'id')
+    const groupByChar = combineBy(res.rows, 'id', 'sei_id', 'sei_aid', 'sei_name', 'note')
     return groupByChar
   }
 
