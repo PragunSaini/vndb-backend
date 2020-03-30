@@ -9,12 +9,33 @@ const mappers = {
     spe: 'TV Special',
     mv: 'Music Video',
   },
+  tagCategory: {
+    tech: 'Technical',
+    ero: 'Content',
+    cont: 'Sexual content',
+  },
+  vnRelation: {
+    seq: 'Prequel',
+    preq: 'Sequel',
+    set: 'Same setting',
+    alt: 'Alternative version',
+    char: 'Shares characters',
+    side: 'Parent story',
+    par: 'Side story',
+    ser: 'Same series',
+    fan: 'Original game',
+    orig: 'Fandisc',
+  },
 }
 
 export function mapAnimeType<T, K extends keyof T>(obj: T, key: K): void {
-  console.log((obj as any).id)
   // @ts-ignore
   obj[key] = mappers.animeType[obj[key]]
+}
+
+export function mapVnRelation<T, K extends keyof T>(obj: T, key: K): void {
+  // @ts-ignore
+  obj[key] = mappers.vnRelation[obj[key]]
 }
 
 // module.exports = {

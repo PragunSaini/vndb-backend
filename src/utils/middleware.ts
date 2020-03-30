@@ -44,7 +44,7 @@ const middleware = {
       res.status(500).send({ message: 'Internal Error occured' })
     }
 
-    next(error)
+    // next(error)
   },
 }
 

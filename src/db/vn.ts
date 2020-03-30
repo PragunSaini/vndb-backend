@@ -1,7 +1,8 @@
 import { getDB, Database } from '../utils/db'
 import { DatabaseError } from '../utils/errors'
 import { groupBy, combineBy } from '../utils/helpers'
-import { mapAnimeType } from '../utils/mappers'
+import { mapAnimeType, mapVnRelation } from '../utils/mappers'
+import { logger } from '../utils/logger'
 
 interface VNResult {
   vn?: any
@@ -43,8 +44,8 @@ async function getPublishers(vnid: number, database: Database): Promise<any> {
   const res = await database.query(
     'SELECT DISTINCT rprod.pid, prod.name, rlang.lang\
     FROM releases_vn rvn JOIN releases_producers rprod ON rvn.id = rprod.id\
-    JOIN releases_lang rlang ON rlang.id = rvn.id\
-    JOIN producers prod ON rprod.pid = prod.id\
+    INNER JOIN releases_lang rlang ON rlang.id = rvn.id\
+    INNER JOIN producers prod ON rprod.pid = prod.id\
     WHERE rvn.vid = $1 AND rprod.publisher',
     [vnid]
   )
@@ -78,6 +79,7 @@ async function getRelations(vnid: number, database: Database): Promise<any> {
 
   if (res.rows.length > 0) {
     const groupedByRelation = groupBy(res.rows, 'relation')
+    groupedByRelation.forEach(relGrp => mapVnRelation(relGrp, 'relation'))
     return groupedByRelation
   }
 
@@ -143,14 +145,15 @@ async function getChars(vnid: number, database: Database): Promise<any> {
             rel.title AS "rel_title" \
     FROM chars_vns cv \
     INNER JOIN chars c USING(id) \
-    INNER JOIN vn_seiyuu vs ON vs.cid = c.id AND vs.id = cv.vid \
-    INNER JOIN staff_alias sta ON vs.aid = sta.aid \
+    LEFT JOIN vn_seiyuu vs ON vs.cid = c.id AND vs.id = cv.vid \
+    LEFT JOIN staff_alias sta ON vs.aid = sta.aid \
     LEFT JOIN releases rel ON cv.rid = rel.id \
     WHERE cv.vid = $1',
     [vnid]
   )
 
   if (res.rows.length > 0) {
+    logger.info(res.rows.length)
     const groupByChar = combineBy(res.rows, 'id', 'sei_id', 'sei_aid', 'sei_name', 'note')
     return groupByChar
   }
