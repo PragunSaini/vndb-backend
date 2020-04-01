@@ -1,7 +1,7 @@
 import { getDB, Database } from '../utils/db'
 import { DatabaseError } from '../utils/errors'
 import { groupBy, combineBy } from '../utils/helpers'
-import { mapAnimeType, mapVnRelation } from '../utils/mappers'
+import { mapAnimeType, mapVnRelation, mapVnlength } from '../utils/mappers'
 import { logger } from '../utils/logger'
 
 interface VNResult {
@@ -17,6 +17,7 @@ interface VNResult {
   tags?: any[]
   chars?: any[]
   releaseinfo?: any[]
+  ratings?: any[]
 }
 
 async function getWikidata(wikiId: number, database: Database): Promise<any> {
@@ -194,6 +195,33 @@ async function getReleaseInfo(vnid: number, database: Database): Promise<any> {
   return res.rows.length > 0 ? res.rows[0] : null
 }
 
+async function getVnRanks(vnid: number, database: Database): Promise<any> {
+  const query1 = await database.query(
+    'SELECT r FROM \
+      (SELECT id, row_number() OVER (ORDER BY c_popularity DESC) AS r FROM vn \
+      WHERE c_popularity IS NOT NULL) AS vnp \
+    WHERE vnp.id = $1',
+    [vnid]
+  )
+  const query2 = await database.query(
+    'SELECT r FROM \
+      (SELECT id, row_number() OVER (ORDER BY c_rating DESC) AS r FROM vn \
+      WHERE c_rating IS NOT NULL) AS vnr \
+    WHERE vnr.id = $1',
+    [vnid]
+  )
+  let [popularityRank, ratingRank] = await Promise.all([query1, query2])
+
+  if (popularityRank.rows.length > 0) {
+    popularityRank = popularityRank.rows[0].r
+  }
+  if (ratingRank.rows.length > 0) {
+    ratingRank = ratingRank.rows[0].r
+  }
+
+  return { popularityRank, ratingRank }
+}
+
 /**
  * Get's all the metadata related to the requested VN
  * @param id Visual Novel's VNDB id
@@ -208,6 +236,8 @@ const getvn = async (id: number): Promise<VNResult> => {
     throw new DatabaseError('VNNOTFOUND', `VN with id ${id} does not exist`)
   }
   vnresult.vn = res.rows[0]
+
+  mapVnlength(vnresult.vn, 'length')
 
   const promises: Promise<any>[] = []
 
@@ -248,6 +278,9 @@ const getvn = async (id: number): Promise<VNResult> => {
   // Get the characters
   promises.push(getChars(id, database))
 
+  // Get VN ranks
+  promises.push(getVnRanks(id, database))
+
   if (vnresult.vn.l_wikidata) {
     ;[
       vnresult.wikidata,
@@ -261,6 +294,7 @@ const getvn = async (id: number): Promise<VNResult> => {
       vnresult.screenshots,
       vnresult.tags,
       vnresult.chars,
+      vnresult.ratings,
     ] = await Promise.all(promises)
   } else {
     ;[
@@ -274,6 +308,7 @@ const getvn = async (id: number): Promise<VNResult> => {
       vnresult.screenshots,
       vnresult.tags,
       vnresult.chars,
+      vnresult.ratings,
     ] = await Promise.all(promises)
   }
 

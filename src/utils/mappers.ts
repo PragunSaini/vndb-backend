@@ -26,6 +26,14 @@ const mappers = {
     fan: 'Original game',
     orig: 'Fandisc',
   },
+  vnLength: {
+    0: null,
+    1: 'Very short (< 2 hours)',
+    2: 'Short (2 - 10 hours)',
+    3: 'Medium (10 - 30 hours)',
+    4: 'Long (30 - 50 hours)',
+    5: 'Very long (> 50 hours)',
+  },
 }
 
 export function mapAnimeType<T, K extends keyof T>(obj: T, key: K): void {
@@ -36,6 +44,11 @@ export function mapAnimeType<T, K extends keyof T>(obj: T, key: K): void {
 export function mapVnRelation<T, K extends keyof T>(obj: T, key: K): void {
   // @ts-ignore
   obj[key] = mappers.vnRelation[obj[key]]
+}
+
+export function mapVnlength<T, K extends keyof T>(obj: T, key: K): void {
+  // @ts-ignore
+  obj.lengthDesc = mappers.vnLength[obj[key]]
 }
 
 // module.exports = {
