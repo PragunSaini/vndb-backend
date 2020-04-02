@@ -1,7 +1,7 @@
 import { getDB, Database } from '../utils/db'
 import { DatabaseError } from '../utils/errors'
 import { groupBy, combineBy } from '../utils/helpers'
-import { mapAnimeType, mapVnRelation, mapVnlength } from '../utils/mappers'
+import { mapAnimeType, mapVnRelation, mapVnlength, mapLanguage } from '../utils/mappers'
 import { logger } from '../utils/logger'
 
 interface VNResult {
@@ -53,6 +53,7 @@ async function getPublishers(vnid: number, database: Database): Promise<any> {
 
   if (res.rows.length > 0) {
     const groupedByLang = groupBy(res.rows, 'lang')
+    groupedByLang.forEach(group => mapLanguage(group, 'lang'))
     return groupedByLang
   }
   return null
@@ -101,6 +102,7 @@ async function getReleases(vnid: number, database: Database): Promise<any> {
 
   if (res.rows.length > 0) {
     const groupByLang = groupBy(res.rows, 'lang')
+    groupByLang.forEach(group => mapLanguage(group, 'lang'))
     const combineByRelease = groupByLang.map(group => {
       return { ...group, rows: combineBy(group.rows, 'id', 'medium', 'qty', 'platform') }
     })
@@ -154,7 +156,6 @@ async function getChars(vnid: number, database: Database): Promise<any> {
   )
 
   if (res.rows.length > 0) {
-    logger.info(res.rows.length)
     const groupByChar = combineBy(res.rows, 'id', 'sei_id', 'sei_aid', 'sei_name', 'note')
     return groupByChar
   }
