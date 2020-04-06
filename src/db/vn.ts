@@ -151,7 +151,7 @@ async function getChars(vnid: number, database: Database): Promise<any> {
     LEFT JOIN vn_seiyuu vs ON vs.cid = c.id AND vs.id = cv.vid \
     LEFT JOIN staff_alias sta ON vs.aid = sta.aid \
     LEFT JOIN releases rel ON cv.rid = rel.id \
-    WHERE cv.vid = $1',
+    WHERE cv.vid = $1 ORDER BY role',
     [vnid]
   )
 
@@ -215,9 +215,13 @@ async function getVnRanks(vnid: number, database: Database): Promise<any> {
 
   if (popularityRank.rows.length > 0) {
     popularityRank = popularityRank.rows[0].r
+  } else {
+    popularityRank = null as any
   }
   if (ratingRank.rows.length > 0) {
     ratingRank = ratingRank.rows[0].r
+  } else {
+    ratingRank = null as any
   }
 
   return { popularityRank, ratingRank }
