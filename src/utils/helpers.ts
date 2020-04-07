@@ -59,7 +59,7 @@ export function combineBy<T, K extends keyof T, U extends (keyof T)[]>(
   const combined = array.reduce((hashmap: any, obj: T) => {
     if (hashmap[JSON.stringify(obj[id])]) {
       keys.forEach(key => {
-        if (obj[key]) {
+        if (obj[key] != undefined) {
           hashmap[JSON.stringify(obj[id])][key].add(obj[key])
         }
       })
@@ -82,6 +82,46 @@ export function combineBy<T, K extends keyof T, U extends (keyof T)[]>(
     keys.forEach(key => {
       combined[k][key] = [...combined[k][key]]
     })
+    return combined[k]
+  })
+}
+
+/**
+ * Combines the objects by a unique id, where the common properties are combined in an array
+ * Same as @see [[combineBy]] but does not remove duplicates
+ * @param array array of objects to combine
+ * @param id the unique key to combine the objects by
+ * @param keys the keys of properties that will be combined
+ * @returns array of unique objects, with properties combined
+ */
+export function combineByAll<T, K extends keyof T, U extends (keyof T)[]>(
+  array: T[],
+  id: K,
+  ...keys: U
+): ArrayOrValue<T, U[number]>[] {
+  // Form a combined object where the value of id serves as the key
+  const combined = array.reduce((hashmap: any, obj: T) => {
+    if (hashmap[JSON.stringify(obj[id])]) {
+      keys.forEach(key => {
+        if (obj[key] != undefined) {
+          hashmap[JSON.stringify(obj[id])][key].push(obj[key])
+        }
+      })
+    } else {
+      hashmap[JSON.stringify(obj[id])] = obj
+      keys.forEach(key => {
+        if (hashmap[JSON.stringify(obj[id])][key] != undefined) {
+          const temp = hashmap[JSON.stringify(obj[id])][key]
+          hashmap[JSON.stringify(obj[id])][key] = [temp]
+        } else {
+          hashmap[JSON.stringify(obj[id])][key] = []
+        }
+      })
+    }
+    return hashmap
+  }, {} as any)
+
+  return Object.keys(combined).map(k => {
     return combined[k]
   })
 }

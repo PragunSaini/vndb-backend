@@ -1,6 +1,6 @@
 import { getDB, Database } from '../utils/db'
 import { DatabaseError } from '../utils/errors'
-import { groupBy, combineBy } from '../utils/helpers'
+import { groupBy, combineBy, combineByAll } from '../utils/helpers'
 import { mapAnimeType, mapVnRelation, mapVnlength, mapLanguage } from '../utils/mappers'
 import { logger } from '../utils/logger'
 
@@ -155,8 +155,32 @@ async function getChars(vnid: number, database: Database): Promise<any> {
     [vnid]
   )
 
+  const traitQuery = `WITH RECURSIVE trait_root(trait, parent, lvl) AS (
+      SELECT tp.trait, tp.parent, 1 AS lvl FROM traits_parents tp
+      WHERE trait IN (Select tid FROM chars_traits WHERE id = $1)
+      UNION ALL
+      SELECT tr.trait, tp.parent, lvl + 1 AS lvl FROM traits_parents tp
+      INNER JOIN trait_root tr ON tp.trait = tr.parent
+    ),
+    root_groups AS (
+      SELECT tr.*, ROW_NUMBER() OVER (PARTITION BY tr.trait ORDER BY tr.lvl DESC) AS rows
+      FROM trait_root tr
+    )
+    SELECT rg.trait, tr1.name AS "trait_name", ct.spoil AS "spoiler", rg.parent, tr2.name AS "parent_name"
+    FROM root_groups rg INNER JOIN traits tr1 ON rg.trait = tr1.id INNER JOIN traits tr2 ON rg.parent = tr2.id
+    INNER JOIN chars_traits ct ON rg.trait = ct.tid AND ct.id = $1
+    WHERE rg.rows = 1 ORDER BY parent;`
+
   if (res.rows.length > 0) {
     const groupByChar = combineBy(res.rows, 'id', 'sei_id', 'sei_aid', 'sei_name', 'note')
+
+    // Now we need to get all the traits of this character
+    // TODO - make these awaits be called asynchronously and resolve using Promise.all
+    for (const char of groupByChar) {
+      const charTraits = await database.query(traitQuery, [char.id])
+      char.traits = combineByAll(charTraits.rows, 'parent', 'trait', 'trait_name', 'spoiler', 'parent_name')
+    }
+
     return groupByChar
   }
 
