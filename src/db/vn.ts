@@ -1,7 +1,7 @@
 import { getDB, Database } from '../utils/db'
 import { DatabaseError } from '../utils/errors'
 import { groupBy, combineBy, combineByAll } from '../utils/helpers'
-import { mapAnimeType, mapVnRelation, mapVnlength, mapLanguage } from '../utils/mappers'
+import { mapAnimeType, mapVnRelation, mapVnlength, mapLanguage, mapRelease } from '../utils/mappers'
 import { logger } from '../utils/logger'
 
 interface VNResult {
@@ -103,6 +103,7 @@ async function getReleases(vnid: number, database: Database): Promise<any> {
   if (res.rows.length > 0) {
     const groupByLang = groupBy(res.rows, 'lang')
     groupByLang.forEach(group => mapLanguage(group, 'lang'))
+    groupByLang.forEach(group => group.rows.forEach(rel => mapRelease(rel)))
     const combineByRelease = groupByLang.map(group => {
       return { ...group, rows: combineBy(group.rows, 'id', 'medium', 'qty', 'platform') }
     })
